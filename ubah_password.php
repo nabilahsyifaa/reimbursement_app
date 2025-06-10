@@ -245,6 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="#">Logout</a>
       </div>
     </div>
+    
 
 <form method="POST" action="">
   <div class="form-group">
