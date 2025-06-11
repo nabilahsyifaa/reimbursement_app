@@ -79,74 +79,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $catatan = $_POST['keterangan'] ?? '';
     $id_aksi = $_POST['id_aksi'] ?? null;
 
-    // Upload bukti
-    $buktiPath = '';
-    if (!empty($_FILES['bukti']['name'])) {
-        $uploadDir = 'uploads/bukti/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        $buktiFile = time() . '_' . basename($_FILES['bukti']['name']);
-        $buktiPath = $uploadDir . $buktiFile;
-        move_uploaded_file($_FILES['bukti']['tmp_name'], $buktiPath);
+ $buktiPath = '';
+if (!empty($_FILES['bukti']['name'])) {
+    // Validasi ukuran maksimal 2MB
+    if ($_FILES['bukti']['size'] > 2 * 1024 * 1024) {
+        $_SESSION['flash_message'] = "Ukuran file bukti tidak boleh lebih dari 2MB.";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
     }
+
+    $uploadDir = 'uploads/bukti/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $buktiFile = time() . '_' . basename($_FILES['bukti']['name']);
+    $buktiPath = $uploadDir . $buktiFile;
+
+    move_uploaded_file($_FILES['bukti']['tmp_name'], $buktiPath);
+}
 
     $stmt = $conn->prepare("INSERT INTO pengajuan (id_user, id_project, id_pm, id_pengeluaran, nominal, bukti, catatan, id_aksi) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("iiiisssi", $id_user, $id_project, $id_pm, $id_pengeluaran, $nominal, $buktiPath, $catatan, $id_aksi);
 
-    if ($stmt->execute()) {
-        $id_pengajuan = $stmt->insert_id;
-        $stmt->close();
+ if (!$stmt->execute()) {
+    $_SESSION['flash_message'] = "Gagal menambahkan pengajuan: " . $stmt->error;
+    $stmt->close();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
 
-        // Simpan ke log_pengajuan jika ada komentar/lampiran
-        if (!empty($_POST['komentar']) || !empty($_FILES['lampiran_komentar']['name'])) {
-            $komentar = $_POST['komentar'] ?? '';
-            $lampiranKomentarPath = '';
+$id_pengajuan = $stmt->insert_id;
+$stmt->close();
 
-            if (!empty($_FILES['lampiran_komentar']['name'])) {
-                $lampiranDir = 'uploads/komentar/';
-                if (!is_dir($lampiranDir)) {
-                    mkdir($lampiranDir, 0777, true);
-                }
-                $lampiranKomentarFile = time() . '_' . basename($_FILES['lampiran_komentar']['name']);
-                $lampiranKomentarPath = $lampiranDir . $lampiranKomentarFile;
-                move_uploaded_file($_FILES['lampiran_komentar']['tmp_name'], $lampiranKomentarPath);
-            }
+// Simpan ke log_pengajuan jika ada komentar/lampiran
+$lampiranKomentarPath = '';
+$komentar = $_POST['komentar'] ?? ''; // ← tambahkan ini jika komentar diperlukan
 
-            $id_aktifitas = 1;
-            $created_at = date("Y-m-d H:i:s");
-            $updated_at = $created_at;
-
-            $stmtLog = $conn->prepare("INSERT INTO log_pengajuan 
-                (id_pengajuan, id_aksi, id_aktifitas, komentar, lampiran_komentar, created_by, created_at, updated_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmtLog->bind_param("iiississ", $id_pengajuan, $id_aksi, $id_aktifitas, $komentar, $lampiranKomentarPath, $id_user, $created_at, $updated_at);
-            $stmtLog->execute();
-            $stmtLog->close();
-        }
-
-        // Tambahkan log menunggu approval PM
-        $id_aktifitas_pm = 2;
-        $created_by_pm = $id_pm;
-        $created_at = date("Y-m-d H:i:s");
-        $stmtLog = $conn->prepare("INSERT INTO log_pengajuan 
-            (id_pengajuan, id_aktifitas, created_by, created_at) 
-            VALUES (?, ?, ?, ?)");
-        $stmtLog->bind_param("iiis", $id_pengajuan, $id_aktifitas_pm, $created_by_pm, $created_at);
-        $stmtLog->execute();
-        $stmtLog->close();
-
-  $_SESSION['flash_message'] = "Reimbursement berhasil diajukan.";
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit;
-    } else {
-        $_SESSION['flash_message'] = "Gagal menambahkan pengajuan: " . $stmt->error;
-        $stmt->close();
+if (!empty($_FILES['lampiran_komentar']['name'])) {
+    if ($_FILES['lampiran_komentar']['size'] > 2 * 1024 * 1024) {
+        $_SESSION['flash_message'] = "Ukuran file lampiran komentar tidak boleh lebih dari 2MB.";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
     }
+
+    $lampiranDir = 'uploads/komentar/';
+    if (!is_dir($lampiranDir)) {
+        mkdir($lampiranDir, 0777, true);
     }
+
+    $lampiranKomentarFile = time() . '_' . basename($_FILES['lampiran_komentar']['name']);
+    $lampiranKomentarPath = $lampiranDir . $lampiranKomentarFile;
+    move_uploaded_file($_FILES['lampiran_komentar']['tmp_name'], $lampiranKomentarPath);
+}
+
+$id_aktifitas = 1;
+$created_at = date("Y-m-d H:i:s");
+$updated_at = $created_at;
+
+$stmtLog = $conn->prepare("INSERT INTO log_pengajuan 
+    (id_pengajuan, id_aksi, id_aktifitas, komentar, lampiran_komentar, created_by, created_at, updated_at) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+$stmtLog->bind_param("iiississ", $id_pengajuan, $id_aksi, $id_aktifitas, $komentar, $lampiranKomentarPath, $id_user, $created_at, $updated_at);
+$stmtLog->execute();
+$stmtLog->close();
+
+// Tambahkan log menunggu approval PM
+$id_aktifitas_pm = 2;
+$created_by_pm = $id_pm;
+$created_at = date("Y-m-d H:i:s");
+$stmtLog = $conn->prepare("INSERT INTO log_pengajuan 
+    (id_pengajuan, id_aktifitas, created_by, created_at) 
+    VALUES (?, ?, ?, ?)");
+$stmtLog->bind_param("iiis", $id_pengajuan, $id_aktifitas_pm, $created_by_pm, $created_at);
+$stmtLog->execute();
+$stmtLog->close();
+
+$_SESSION['flash_message'] = "Pengajuan berhasil ditambahkan.";
+header("Location: " . $_SERVER['PHP_SELF']);
+exit;
+    }
+
 
 ?>
 

@@ -147,7 +147,7 @@ $result = $stmt->get_result();
       font-weight: 500;
       margin-bottom: 15px;
       transition: background 0.2s;
-            text-decoration: none; /* Hilangkan underline */
+      text-decoration: none; /* Hilangkan underline */
     }
 
     .btn:hover {

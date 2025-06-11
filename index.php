@@ -115,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border: 1px solid #ccc;
       border-radius: 10px;
       font-size: 14px;
+      font-family: 'Segoe UI'
     }
 
     .login-button {
@@ -175,9 +176,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit">Login</button>
       </div>
       
+      <br>
         <?php if (!empty($error)): ?>
-    <p style="color: red;"><?= htmlspecialchars($error) ?></p>
-  <?php endif; ?>
+        <p style="color: red; font-size: 14px; font-family: 'Segoe UI'; font-weight: bold;">
+          <?= htmlspecialchars($error) ?>
+        </p>
+      <?php endif; ?>
 
     </form>
       </div>

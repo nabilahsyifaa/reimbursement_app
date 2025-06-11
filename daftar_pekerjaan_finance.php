@@ -279,8 +279,8 @@ $result = $stmt->get_result();
     <div class="topbar">
       <h1>Daftar Pekerjaan</h1>
       <div>
-        <a href="#">Ubah Password</a>
-        <a href="#">Logout</a>
+        <a href="ubah_password.php">Ubah Password</a>
+        <a href="logout.php">Logout</a>
       </div>
     </div>
 

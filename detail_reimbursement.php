@@ -338,11 +338,6 @@ textarea[disabled] {
   <?= htmlspecialchars($namaLengkap) ?><br>
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
-  <a href="dashboard_employee.php">Dashboard</a>
-  <a href="#">Reimbursement</a>
-  <a href="#">Pengajuan</a>
-  <a href="#">Daftar Pekerjaan</a>
-  <a href="#">Monitor</a>
 </div>
 
 <div class="main">

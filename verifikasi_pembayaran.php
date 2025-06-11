@@ -93,11 +93,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lampiran = $_FILES['lampiran_komentar'] ?? null;
     $fileName = null;
 
-    if ($lampiran && $lampiran['error'] == 0) {
-        $ext = pathinfo($lampiran['name'], PATHINFO_EXTENSION);
-        $fileName = 'uploads/lampiran_' . time() . '.' . $ext;
-        move_uploaded_file($lampiran['tmp_name'], $fileName);
+if ($lampiran && $lampiran['error'] == 0) {
+    if ($lampiran['size'] > 2 * 1024 * 1024) { // 2 MB
+        $_SESSION['flash_message'] = "Lampiran komentar tidak boleh lebih dari 2 MB.";
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit();
     }
+
+    $ext = pathinfo($lampiran['name'], PATHINFO_EXTENSION);
+    $uploadDir = 'uploads/komentar/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true); // Buat folder jika belum ada
+    }
+    $fileName = $uploadDir . 'komentar_' . time() . '.' . $ext;
+    move_uploaded_file($lampiran['tmp_name'], $fileName);
+}
+
 
     $waktu = date('Y-m-d H:i:s');
 
@@ -390,11 +401,10 @@ textarea[disabled] {
   <?= htmlspecialchars($namaLengkap) ?><br>
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
-  <a href="dashboard_employee.php">Dashboard</a>
-  <a href="#">Reimbursement</a>
-  <a href="#">Pengajuan</a>
-  <a href="#">Daftar Pekerjaan</a>
-  <a href="#">Monitor</a>
+    <a href="dashboard_finance.php">Dashboard</a>
+    <a href="pengajuan_reimbursement.php">Pengajuan</a>
+    <a href="daftar_pekerjaan_finance.php">Daftar Pekerjaan</a>
+    <a href="monitor_reimbursement.php">Monitor</a>
 </div>
 
 <div class="main">
@@ -413,8 +423,8 @@ textarea[disabled] {
   <div class="topbar">
     <h1>Persetujuan Project Manager</h1>
     <div>
-      <a href="#">Ubah Password</a>
-      <a href="#">Logout</a>
+      <a href="ubah_password.php">Ubah Password</a>
+      <a href="logout.php">Logout</a>
     </div>
   </div>
 
