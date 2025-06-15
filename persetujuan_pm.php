@@ -93,35 +93,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lampiran = $_FILES['lampiran_komentar'] ?? null;
     $fileName = null;
 
-if ($lampiran && $lampiran['error'] == 0) {
-    if ($lampiran['size'] > 2 * 1024 * 1024) { // 2 MB
-        $_SESSION['flash_message'] = "Lampiran komentar tidak boleh lebih dari 2 MB.";
-        header("Location: " . $_SERVER['REQUEST_URI']);
-        exit();
-    }
-
-    $ext = pathinfo($lampiran['name'], PATHINFO_EXTENSION);
-    $uploadDir = 'uploads/komentar/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true); // Buat folder jika belum ada
-    }
-    $fileName = $uploadDir . 'komentar_' . time() . '.' . $ext;
-    move_uploaded_file($lampiran['tmp_name'], $fileName);
-}
-
-    $waktu = date('Y-m-d H:i:s');
+    $updated_at = date('Y-m-d H:i:s'); // Format waktu yang sesuai
 
     // Update log pengajuan
 // UPDATE log_pengajuan yang benar
 $stmtUpdate = $conn->prepare("
     UPDATE log_pengajuan 
-    SET id_aktifitas = 5, id_aksi = ?, komentar = ?, lampiran_komentar = ?, updated_at = ?
+    SET id_aksi = ?, komentar = ?, lampiran_komentar = ?, updated_at = ?
     WHERE id_pengajuan = ? AND id_aktifitas = 2 AND id_aksi IS NULL
 ");
-$stmtUpdate->bind_param("isssi", $id_aksi, $komentar, $fileName, $waktu, $id_pengajuan);
+$stmtUpdate->bind_param("isssi", $id_aksi, $komentar, $fileName, $updated_at, $id_pengajuan);
 $updateSuccess = $stmtUpdate->execute();
 $stmtUpdate->close();
-
 
     if ($updateSuccess) {
         // Jika disetujui (Setuju / id_aksi = 2), tambahkan log untuk finance
@@ -406,9 +389,8 @@ textarea[disabled] {
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
     <a href="dashboard_pm.php">Dashboard</a>
-    <a href="pengajuan_reimbursement.php">Pengajuan</a>
     <a href="daftar_pekerjaan_pm.php">Daftar Pekerjaan</a>
-    <a href="monitor_reimbursement.php">Monitor</a>
+    <a href="monitor_reimbursement_pm.php">Monitor Reimbursement</a>
 </div>
 
 <div class="main">
@@ -427,6 +409,7 @@ textarea[disabled] {
   <div class="topbar">
     <h1>Persetujuan Project Manager</h1>
     <div>
+      <a href="pindah_posisi.php">Ubah Password</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
     </div>
@@ -527,7 +510,7 @@ textarea[disabled] {
   <div class="form-group">
     <label>Pilih Aksi</label>
     <select name="id_aksi" required>
-      <option value="">Pilih Aksi</option>
+      <option value="">Pilih Aksi*</option>
       <?php foreach ($aksiList as $aksi): ?>
         <option value="<?= $aksi['id_aksi'] ?>"><?= htmlspecialchars($aksi['nama_aksi']) ?></option>
       <?php endforeach; ?>
@@ -535,13 +518,8 @@ textarea[disabled] {
   </div>
 
   <div class="form-group">
-    <label>Komentar</label>
+    <label>Komentar*</label>
     <textarea name="komentar" rows="2" placeholder="Komentar untuk log pengajuan" required></textarea>
-  </div>
-
-  <div class="form-group">
-    <label>Lampiran Komentar</label>
-    <input type="file" name="lampiran_komentar">
   </div>
 
   <table class="table table-bordered table-striped">

@@ -286,14 +286,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <a href="master_divisi.php">Master Divisi</a>
   <a href="master_posisi.php">Master Posisi</a>
   <a href="master_project.php">Project List</a>
-  <a href="pengajuan_reimbursement_admin.php">Pengajuan Reimbursement</a>
-  <a href="monitor_reimbursement.php">Monitor Rembursement</a>
+  <a href="monitor_reimbursement_admin.php">Monitor Reimbursement</a>
   </div>
 
   <div class="main">
     <div class="topbar">
       <h1>Ubah Project</h1>
       <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
       </div>

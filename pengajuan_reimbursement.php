@@ -119,23 +119,6 @@ $stmt->close();
 $lampiranKomentarPath = '';
 $komentar = $_POST['komentar'] ?? ''; // ← tambahkan ini jika komentar diperlukan
 
-if (!empty($_FILES['lampiran_komentar']['name'])) {
-    if ($_FILES['lampiran_komentar']['size'] > 2 * 1024 * 1024) {
-        $_SESSION['flash_message'] = "Ukuran file lampiran komentar tidak boleh lebih dari 2MB.";
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit;
-    }
-
-    $lampiranDir = 'uploads/komentar/';
-    if (!is_dir($lampiranDir)) {
-        mkdir($lampiranDir, 0777, true);
-    }
-
-    $lampiranKomentarFile = time() . '_' . basename($_FILES['lampiran_komentar']['name']);
-    $lampiranKomentarPath = $lampiranDir . $lampiranKomentarFile;
-    move_uploaded_file($_FILES['lampiran_komentar']['tmp_name'], $lampiranKomentarPath);
-}
-
 $id_aktifitas = 1;
 $created_at = date("Y-m-d H:i:s");
 $updated_at = $created_at;
@@ -158,7 +141,7 @@ $stmtLog->bind_param("iiis", $id_pengajuan, $id_aktifitas_pm, $created_by_pm, $c
 $stmtLog->execute();
 $stmtLog->close();
 
-$_SESSION['flash_message'] = "Pengajuan berhasil ditambahkan.";
+$_SESSION['flash_message'] = "Reimbursement berhasil diajukan.";
 header("Location: " . $_SERVER['PHP_SELF']);
 exit;
 
@@ -389,10 +372,9 @@ textarea[disabled] {
   <?= htmlspecialchars($namaLengkap) ?><br>
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
-    <a href="#">Dashboard</a>
-    <a href="pengajuan_reimbursement.php">Pengajuan</a>
-    <a href="#">Daftar Pekerjaan</a>
-    <a href="#">Monitor</a>
+    <a href="dashboard_employee.php">Dashboard</a>
+    <a href="pengajuan_reimbursement.php">Pengajuan Reimbursement</a>
+    <a href="monitor_reimbursement_employee.php">Monitor Reimbursement</a>
   </div>
 
   <div class="main">
@@ -408,10 +390,10 @@ textarea[disabled] {
   </script>
 <?php endif; ?>
 
-
     <div class="topbar">
       <h1>Pengajuan Reimbursement</h1>
       <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
       </div>
@@ -445,7 +427,7 @@ textarea[disabled] {
   </div>
 
   <div class="form-group">
-  <label>Project</label>
+  <label>Project*</label>
   <select name="id_project" id="id_project" onchange="updatePM()" required>
     <option value="">Pilih Project</option>
     <?php foreach ($projects as $project): ?>
@@ -465,7 +447,7 @@ textarea[disabled] {
 
 
   <div class="form-group">
-  <label>Jenis Pengeluaran</label>
+  <label>Jenis Pengeluaran*</label>
   <select name="id_pengeluaran" required>
     <option value="">Pilih Jenis Pengeluaran</option>
     <?php foreach ($pengeluarans as $p): ?>
@@ -476,12 +458,12 @@ textarea[disabled] {
 
 
   <div class="form-group">
-    <label>Nominal</label>
+    <label>Nominal*</label>
 <input type="text" name="nominal" id="nominal" placeholder="Nominal" required oninput="formatRupiah(this)">
   </div>
 
 <div class="form-group">
-  <label>Bukti</label>
+  <label>Bukti*</label>
   <input type="file" name="bukti" accept=".jpg,.jpeg,.png,.pdf" required>
   <small class="form-text text-muted">
     Hanya file dengan format <strong>JPG, JPEG, PNG, atau PDF</strong> yang diperbolehkan.
@@ -496,7 +478,7 @@ textarea[disabled] {
   <h5 style="margin-top: 30px; margin-bottom: 15px; font-weight: bold;">Komentar</h5>
 
 <div class="form-group">
-  <label>Pilih Aksi</label>
+  <label>Pilih Aksi*</label>
   <select name="id_aksi" required>
     <option value="">Pilih Aksi</option>
     <?php foreach ($aksiList as $aksi): ?>
@@ -506,13 +488,8 @@ textarea[disabled] {
 </div>
 
 <div class="form-group">
-  <label>Komentar</label>
+  <label>Komentar*</label>
   <textarea name="komentar" rows="2" placeholder="Komentar untuk log pengajuan" required></textarea>
-</div>
-
-<div class="form-group">
-  <label>Lampiran Komentar</label>
-  <input type="file" name="lampiran_komentar">
 </div>
 
 <table class="table table-bordered table-striped">
@@ -530,8 +507,6 @@ textarea[disabled] {
     <!-- Baris data -->
   </tbody>
 </table>
-
-
 
   <div class="form-actions">
     <button type="button" onclick="window.history.back()">Kembali</button>

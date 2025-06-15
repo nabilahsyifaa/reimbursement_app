@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($lampiran && $lampiran['error'] == 0) {
     if ($lampiran['size'] > 2 * 1024 * 1024) { // 2 MB
-        $_SESSION['flash_message'] = "Lampiran komentar tidak boleh lebih dari 2 MB.";
+        $_SESSION['flash_message'] = "Bukti Pembayaran tidak boleh lebih dari 2 MB.";
         header("Location: " . $_SERVER['REQUEST_URI']);
         exit();
     }
@@ -184,7 +184,7 @@ while ($row = $resLogs->fetch_assoc()) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Persetujuan Project Manager</title>
+  <title>Verifikasi dan Pembayaran</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
    <!-- Tambahkan ini: Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -402,9 +402,8 @@ textarea[disabled] {
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
     <a href="dashboard_finance.php">Dashboard</a>
-    <a href="pengajuan_reimbursement.php">Pengajuan</a>
     <a href="daftar_pekerjaan_finance.php">Daftar Pekerjaan</a>
-    <a href="monitor_reimbursement.php">Monitor</a>
+    <a href="monitor_reimbursement_finance.php">Monitor Reimbursement</a>
 </div>
 
 <div class="main">
@@ -421,8 +420,9 @@ textarea[disabled] {
 <?php endif; ?>
 
   <div class="topbar">
-    <h1>Persetujuan Project Manager</h1>
+    <h1>Verifikasi dan Pembayaran</h1>
     <div>
+      <a href="pindah_posisi.php">Ubah Password</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
     </div>
@@ -521,7 +521,7 @@ textarea[disabled] {
   <h5 style="margin-top: 30px; margin-bottom: 15px; font-weight: bold;">Komentar</h5>
 
   <div class="form-group">
-    <label>Pilih Aksi</label>
+    <label>Pilih Aksi*</label>
     <select name="id_aksi" required>
       <option value="">Pilih Aksi</option>
       <?php foreach ($aksiList as $aksi): ?>
@@ -531,12 +531,12 @@ textarea[disabled] {
   </div>
 
   <div class="form-group">
-    <label>Komentar</label>
+    <label>Komentar*</label>
     <textarea name="komentar" rows="2" placeholder="Komentar untuk log pengajuan" required></textarea>
   </div>
 
   <div class="form-group">
-    <label>Lampiran Komentar</label>
+    <label>Bukti Pembayaran*</label>
     <input type="file" name="lampiran_komentar">
   </div>
 

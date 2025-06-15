@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validasi posisi
     if (empty($id_posisi)) {
         $_SESSION['flash_message'] = "Pilih posisi terlebih dahulu.";
-        header("Location: master_user.php");
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 
@@ -66,9 +66,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($id_divisi) || empty($id_role)) {
         $_SESSION['flash_message'] = "Divisi atau role untuk posisi tersebut tidak ditemukan.";
-        header("Location: master_user.php");
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
+
+
+    $id_posisi2 = $_POST['id_posisi2'] ?? null;
+$id_divisi2 = null;
+
+if (!empty($id_posisi2)) {
+    $stmt2 = $conn->prepare("SELECT id_divisi FROM positions WHERE id_posisi = ?");
+    $stmt2->bind_param("s", $id_posisi2);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+    if ($row2 = $result2->fetch_assoc()) {
+        $id_divisi2 = $row2['id_divisi'];
+    }
+    $stmt2->close();
+}
+
+$id_role2 = null;
+
+if (!empty($id_posisi2)) {
+    $stmt2 = $conn->prepare("SELECT id_divisi, id_role FROM positions WHERE id_posisi = ?");
+    $stmt2->bind_param("s", $id_posisi2);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+    if ($row2 = $result2->fetch_assoc()) {
+        $id_divisi2 = $row2['id_divisi'];
+        $id_role2 = $row2['id_role']; // ← Tambahkan ini
+    }
+    $stmt2->close();
+}
 
     // Cek duplikasi email atau NIK
     $check = $conn->prepare("SELECT * FROM users WHERE (email = ? OR nik = ?) AND deleted_at IS NULL");
@@ -85,9 +114,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check->close();
 
     // Simpan data ke database
-    $stmt = $conn->prepare("INSERT INTO users (nama_lengkap, email, no_telepon, nik, bank, no_rekening, id_posisi, id_divisi, id_role, password, status)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssssisi", $nama_lengkap, $email, $no_telepon, $nik, $bank, $no_rekening, $id_posisi, $id_divisi, $id_role, $password, $status);
+    $stmt = $conn->prepare("INSERT INTO users 
+    (nama_lengkap, email, no_telepon, nik, bank, no_rekening, id_posisi, id_divisi, id_role, id_posisi2, id_divisi2, id_role2, password, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param("sssssssssssssi", 
+        $nama_lengkap, $email, $no_telepon, $nik, $bank, $no_rekening, 
+        $id_posisi, $id_divisi, $id_role, 
+        $id_posisi2, $id_divisi2, $id_role2, 
+        $password, $status
+    );
+
 
     if ($stmt->execute()) {
         $_SESSION['flash_message'] = "User berhasil ditambahkan.";
@@ -318,14 +355,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <a href="master_divisi.php">Master Divisi</a>
   <a href="master_posisi.php">Master Posisi</a>
   <a href="master_project.php">Project List</a>
-  <a href="pengajuan_reimbursement_admin.php">Pengajuan Reimbursement</a>
-  <a href="monitor_reimbursement.php">Monitor Rembursement</a>
+  <a href="monitor_reimbursement_admin.php">Monitor Reimbursement</a>
 </div>
 
 <div class="main">
   <div class="topbar">
     <h1>Tambah User Akses</h1>
     <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>      
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
     </div>
@@ -341,7 +378,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Posisi -->
 <div class="form-group">
-  <label for="posisi">Posisi</label>
+  <label for="posisi">Posisi Utama</label>
   <select id="posisi" name="id_posisi">
     <option value="">Pilih Posisi</option>
     <?php foreach ($positions as $pos): ?>
@@ -358,6 +395,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <label>Divisi</label>
   <input type="text" id="divisi" disabled style="background-color: #eee;" />
 </div>
+
+<div class="form-group">
+  <label for="posisi">Posisi Lainnya</label>
+  <select id="posisi2" name="id_posisi2">
+    <option value="">Pilih Posisi</option>
+    <?php foreach ($positions as $pos): ?>
+      <option value="<?= $pos['id_posisi'] ?>" data-divisi="<?= htmlspecialchars($pos['nama_divisi']) ?>">
+        <?= htmlspecialchars($pos['nama_posisi']) ?>
+      </option>
+    <?php endforeach; ?>
+  </select>
+</div>
+
+<!-- Divisi Lainnya (readonly) -->
+<div class="form-group">
+  <label>Divisi</label>
+  <input type="text" id="divisi2" disabled style="background-color: #eee;" />
+</div>
+
 
     <div class="form-group"><label>Password</label><input type="password" name="password" placeholder="Masukkan Password" required /></div>
     <div class="form-group">
@@ -376,12 +432,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <script>
+  // Posisi utama
   document.getElementById('posisi').addEventListener('change', function () {
     const selected = this.options[this.selectedIndex];
     const divisi = selected.getAttribute('data-divisi') || '';
     document.getElementById('divisi').value = divisi;
   });
+
+  // Posisi kedua
+  document.getElementById('posisi2').addEventListener('change', function () {
+    const selected = this.options[this.selectedIndex];
+    const divisi = selected.getAttribute('data-divisi') || '';
+    document.getElementById('divisi2').value = divisi;
+  });
 </script>
+
 
 <div id="notification"></div>
 

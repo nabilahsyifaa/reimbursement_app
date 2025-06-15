@@ -12,6 +12,11 @@ $user_id = $_SESSION['user_id'];
 $namaLengkap = $_SESSION['nama'] ?? 'User';
 $namaPosisi = $_SESSION['nama_posisi'] ?? 'Posisi';
 
+if (isset($_SESSION['flash_message'])) {
+    $message = $_SESSION['flash_message'];
+    unset($_SESSION['flash_message']);
+}
+
 // Ambil notifikasi jika ada
 $message = "";
 if (isset($_SESSION['message'])) {
@@ -269,15 +274,15 @@ $result = $stmt->get_result();
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
     <a href="dashboard_pm.php">Dashboard</a>
-    <a href="pengajuan_reimbursement.php">Pengajuan</a>
     <a href="daftar_pekerjaan_pm.php">Daftar Pekerjaan</a>
-    <a href="monitor_reimbursement.php">Monitor</a>
+    <a href="monitor_reimbursement_pm.php">Monitor Reimbursement</a>
   </div>
 
   <div class="main">
     <div class="topbar">
       <h1>Dashboard</h1>
       <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
       </div>

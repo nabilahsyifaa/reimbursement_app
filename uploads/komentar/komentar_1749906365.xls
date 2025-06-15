@@ -1,0 +1,10 @@
+<table border='1'><tr>
+    <th>ID Pengajuan</th>
+    <th>Nama</th>
+    <th>Posisi</th>
+    <th>Divisi</th>
+    <th>Project</th>
+    <th>Jenis Pengeluaran</th>
+    <th>Nominal</th>
+    <th>Status</th>
+</tr><tr><td>10</td><td>Novria Nur</td><td>Helpdesk</td><td>Business Support Team</td><td>New Digital Procurement CIMB Niaga</td><td>Transportasi</td><td>50.000</td><td>Ditolak oleh Finance</td></tr><tr><td>10</td><td>Novria Nur</td><td>Helpdesk</td><td>Business Support Team</td><td>New Digital Procurement CIMB Niaga</td><td>Transportasi</td><td>50.000</td><td>Tidak Disetujui oleh Project Manager</td></tr><tr><td>9</td><td>Novria Nur</td><td>Helpdesk</td><td>Business Support Team</td><td>New Digital Procurement CIMB Niaga</td><td>Konsumsi</td><td>90.000</td><td>Persetujuan Project Manager</td></tr><tr><td>6</td><td>Novria Nur</td><td>Helpdesk</td><td>Business Support Team</td><td>New Digital Procurement CIMB Niaga</td><td>Akomodasi</td><td>700.000</td><td>Ditolak oleh Finance</td></tr><tr><td>2</td><td>Novria Nur</td><td>Helpdesk</td><td>Business Support Team</td><td>New Digital Procurement CIMB Niaga</td><td>Akomodasi</td><td>50.000</td><td>Ditolak oleh Finance</td></tr><tr><td>6</td><td>Novria Nur</td><td>Helpdesk</td><td>Business Support Team</td><td>New Digital Procurement CIMB Niaga</td><td>Akomodasi</td><td>700.000</td><td>Tidak Disetujui oleh Project Manager</td></tr></table>

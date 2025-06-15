@@ -269,15 +269,15 @@ $result = $stmt->get_result();
   <small><?= htmlspecialchars($namaPosisi) ?></small>
 </p>
     <a href="dashboard_pm.php">Dashboard</a>
-    <a href="pengajuan_reimbursement.php">Pengajuan</a>
     <a href="daftar_pekerjaan_pm.php">Daftar Pekerjaan</a>
-    <a href="monitor_reimbursement.php">Monitor</a>
+    <a href="monitor_reimbursement_pm.php">Monitor Reimbursement</a>
   </div>
 
   <div class="main">
     <div class="topbar">
       <h1>Daftar Pekerjaan</h1>
       <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
       </div>

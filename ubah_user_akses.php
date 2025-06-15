@@ -157,7 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tambah User Akses</title>
+  <title>Ubah User Akses</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     /* style tetap sama seperti sebelumnya (tidak diubah) */
@@ -368,14 +368,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <a href="master_divisi.php">Master Divisi</a>
   <a href="master_posisi.php">Master Posisi</a>
   <a href="master_project.php">Project List</a>
-  <a href="pengajuan_reimbursement_admin.php">Pengajuan Reimbursement</a>
-  <a href="monitor_reimbursement.php">Monitor Rembursement</a>
+  <a href="monitor_reimbursement_admin.php">Monitor Reimbursement</a>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <h1>Tambah User Akses</h1>
+    <h1>Ubah User Akses</h1>
     <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
     </div>

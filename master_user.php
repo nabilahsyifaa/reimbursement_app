@@ -14,14 +14,22 @@ $namaPosisi = $_SESSION['nama_posisi'] ?? 'Posisi';
 
 // Ambil data dari tabel users dengan join ke tabel divisi dan posisi
 $query = "
-SELECT users.*, divisions.nama_divisi, positions.nama_posisi
+SELECT 
+    users.*, 
+    d1.nama_divisi AS nama_divisi_utama, 
+    d2.nama_divisi AS nama_divisi_lainnya,
+    p1.nama_posisi AS nama_posisi_utama, 
+    p2.nama_posisi AS nama_posisi_lainnya
 FROM users
-LEFT JOIN divisions ON users.id_divisi = divisions.id_divisi
-LEFT JOIN positions ON users.id_posisi = positions.id_posisi
+LEFT JOIN divisions d1 ON users.id_divisi = d1.id_divisi
+LEFT JOIN divisions d2 ON users.id_divisi2 = d2.id_divisi
+LEFT JOIN positions p1 ON users.id_posisi = p1.id_posisi
+LEFT JOIN positions p2 ON users.id_posisi2 = p2.id_posisi
 WHERE users.deleted_at IS NULL
 ORDER BY users.created_at DESC
 ";
 $result = $conn->query($query);
+
 
 // Ambil pesan notifikasi jika ada
 $message = '';
@@ -228,14 +236,14 @@ if (isset($_SESSION['flash_message'])) {
   <a href="master_divisi.php">Master Divisi</a>
   <a href="master_posisi.php">Master Posisi</a>
   <a href="master_project.php">Project List</a>
-  <a href="pengajuan_reimbursement_admin.php">Pengajuan Reimbursement</a>
-  <a href="monitor_reimbursement.php">Monitor Rembursement</a>
+  <a href="monitor_reimbursement_admin.php">Monitor Reimbursement</a>
   </div>
 
   <div class="main">
     <div class="topbar">
       <h1>User Akses</h1>
       <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
       </div>
@@ -274,7 +282,9 @@ if (isset($_SESSION['flash_message'])) {
           <th>Email</th>
           <th>NIK</th>
           <th>No. Telepon</th>
-          <th>Posisi</th>
+          <th>Posisi Utama</th>
+          <th>Divisi</th>
+          <th>Posisi Lainnya</th>
           <th>Divisi</th>
           <th>Bank</th>
           <th>No. Rekening</th>
@@ -293,8 +303,10 @@ if (isset($_SESSION['flash_message'])) {
               <td><?= htmlspecialchars($row['email']) ?></td>
               <td><?= htmlspecialchars($row['nik']) ?></td>
               <td><?= htmlspecialchars($row['no_telepon']) ?></td>
-              <td><?= htmlspecialchars($row['nama_posisi']) ?></td>
-              <td><?= htmlspecialchars($row['nama_divisi']) ?></td>
+              <td><?= htmlspecialchars($row['nama_posisi_utama']) ?></td>
+              <td><?= htmlspecialchars($row['nama_divisi_utama']) ?></td>
+              <td><?= htmlspecialchars($row['nama_posisi_lainnya']) ?></td>
+              <td><?= htmlspecialchars($row['nama_divisi_lainnya']) ?></td>
               <td><?= htmlspecialchars($row['bank']) ?></td>
               <td><?= htmlspecialchars($row['no_rekening']) ?></td>
               <td><?= $row['status'] ? 'Aktif' : 'Nonaktif' ?></td>
