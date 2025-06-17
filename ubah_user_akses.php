@@ -32,6 +32,9 @@ if ($user_id) {
     if ($result && $result->num_rows > 0) {
         $edit_data = $result->fetch_assoc();
         $is_edit = true;
+
+        $id_posisi2 = $edit_data['id_posisi2'] ?? '';
+        $id_divisi2 = $edit_data['id_divisi2'] ?? '';
     }
     $stmt->close();
 }
@@ -62,6 +65,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_posisi = $_POST['posisi'] ?? '';
     $password_input = $_POST['password'] ?? '';
     $status = isset($_POST['status']) ? 1 : 0;
+    $id_posisi2 = $_POST['id_posisi2'] ?? null;
+    $id_divisi2 = null;
+    $id_role2 = null;
+
+    if (!empty($id_posisi2)) {
+        $stmt = $conn->prepare("SELECT id_divisi, id_role FROM positions WHERE id_posisi = ?");
+        $stmt->bind_param("s", $id_posisi2);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $id_divisi2 = $row['id_divisi'];
+            $id_role2 = $row['id_role'];
+        }
+        $stmt->close();
+    }
 
     if (empty($id_posisi)) {
         $message = "Pilih posisi terlebih dahulu.";
@@ -96,12 +114,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($id_user) {
                     // UPDATE USER
                     if (!empty($password_input)) {
-                        $password = password_hash($password_input, PASSWORD_DEFAULT);
-                        $stmt = $conn->prepare("UPDATE users SET nama_lengkap=?, email=?, no_telepon=?, nik=?, bank=?, no_rekening=?, id_posisi=?, id_divisi=?, id_role=?, password=?, status=?, updated_at=? WHERE id_user=?");
-                        $stmt->bind_param("ssssssssisssi", $nama_lengkap, $email, $no_telepon, $nik, $bank, $no_rekening, $id_posisi, $id_divisi, $id_role, $password, $status, $now, $id_user);
-                    } else {
-                        $stmt = $conn->prepare("UPDATE users SET nama_lengkap=?, email=?, no_telepon=?, nik=?, bank=?, no_rekening=?, id_posisi=?, id_divisi=?, id_role=?, status=?, updated_at=? WHERE id_user=?");
-                        $stmt->bind_param("sssssssisssi", $nama_lengkap, $email, $no_telepon, $nik, $bank, $no_rekening, $id_posisi, $id_divisi, $id_role, $status, $now, $id_user);
+    $password = password_hash($password_input, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("UPDATE users 
+        SET nama_lengkap=?, email=?, no_telepon=?, nik=?, bank=?, no_rekening=?, 
+            id_posisi=?, id_divisi=?, id_role=?, 
+            id_posisi2=?, id_divisi2=?, id_role2=?, 
+            password=?, status=?, updated_at=? 
+        WHERE id_user=?");
+    $stmt->bind_param("sssssssiiiissssi", 
+        $nama_lengkap, $email, $no_telepon, $nik, $bank, $no_rekening,
+        $id_posisi, $id_divisi, $id_role,
+        $id_posisi2, $id_divisi2, $id_role2,
+        $password, $status, $now, $id_user
+    );
+}
+ else {
+                        $stmt = $conn->prepare("UPDATE users 
+    SET nama_lengkap=?, email=?, no_telepon=?, nik=?, bank=?, no_rekening=?, 
+        id_posisi=?, id_divisi=?, id_role=?, 
+        id_posisi2=?, id_divisi2=?, id_role2=?,
+        status=?, updated_at=? 
+    WHERE id_user=?");
+$stmt->bind_param("sssssssiiiiissi", 
+    $nama_lengkap, $email, $no_telepon, $nik, $bank, $no_rekening,
+    $id_posisi, $id_divisi, $id_role,
+    $id_posisi2, $id_divisi2, $id_role2,
+    $status, $now, $id_user
+);
+
                     }
 
                     if ($stmt->execute()) {
@@ -445,6 +485,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     ?>" />
 </div>
+
+<div class="form-group">
+  <label for="posisi">Posisi Lainnya</label>
+  <select id="posisi2" name="id_posisi2" class="form-control">
+    <option value="">Pilih Posisi</option>
+    <?php foreach ($positions as $pos): ?>
+      <option value="<?= $pos['id_posisi'] ?>" data-divisi="<?= htmlspecialchars($pos['nama_divisi']) ?>"
+        <?= isset($id_posisi2) && $id_posisi2 == $pos['id_posisi'] ? 'selected' : '' ?>>
+        <?= htmlspecialchars($pos['nama_posisi']) ?>
+      </option>
+    <?php endforeach; ?>
+  </select>
+</div>
+
+
+<div class="form-group">
+  <label>Divisi</label>
+  <input type="text" id="divisi2" disabled style="background-color: #eee;" />
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const posisiSelect = document.getElementById('posisi2');
+  const divisiInput = document.getElementById('divisi2');
+
+  function updateDivisi() {
+    const selected = posisiSelect.options[posisiSelect.selectedIndex];
+    const divisi = selected.getAttribute('data-divisi') || '';
+    divisiInput.value = divisi;
+  }
+
+  posisiSelect.addEventListener('change', updateDivisi);
+
+  // Set default value saat halaman dimuat
+  updateDivisi();
+});
+</script>
+
 
 <div class="form-group"><label>Password</label>
   <input type="password" name="password" placeholder="Masukkan Password" <?= $is_edit ? '' : 'required' ?> />

@@ -44,7 +44,15 @@ $sql = "SELECT
     pr.nama_project,
     j.nama_pengeluaran,
     p.nominal,
-    a.nama_aktifitas
+    a.nama_aktifitas,
+    (
+        SELECT lp.created_at 
+        FROM log_pengajuan lp 
+        WHERE lp.id_pengajuan = l.id_pengajuan 
+          AND lp.id_aksi = 1 
+        ORDER BY lp.created_at ASC 
+        LIMIT 1
+    ) AS tanggal_pengajuan
 FROM log_pengajuan l
 JOIN pengajuan p ON l.id_pengajuan = p.id_pengajuan
 JOIN users u ON p.id_user = u.id_user
@@ -55,9 +63,7 @@ LEFT JOIN jenis_pengeluaran j ON p.id_pengeluaran = j.id_pengeluaran
 LEFT JOIN aktifitas a ON l.id_aktifitas = a.id_aktifitas
 WHERE 
     ((l.id_aktifitas IN (5,6)) OR (l.updated_at IS NULL AND l.id_aktifitas NOT IN (5,6)))
-    AND p.id_user = ?
-";
-
+    AND p.id_user = ?";
 
 $params = [$user_id];
 $types = "i";
@@ -88,6 +94,7 @@ if ($filterPosisi !== "") {
     $types .= "i";
 }
 
+// Ini penutup yang BENAR
 $sql .= " ORDER BY l.created_at DESC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param($types, ...$params);
@@ -102,29 +109,32 @@ if (isset($_GET['export']) && $_GET['export'] === 'true') {
     header("Expires: 0");
 
     echo "<table border='1'>";
-    echo "<tr>
-        <th>ID Pengajuan</th>
-        <th>Nama</th>
-        <th>Posisi</th>
-        <th>Divisi</th>
-        <th>Project</th>
-        <th>Jenis Pengeluaran</th>
-        <th>Nominal</th>
-        <th>Status</th>
-    </tr>";
+ echo "<tr>
+    <th>ID Pengajuan</th>
+    <th>Nama</th>
+    <th>Posisi</th>
+    <th>Divisi</th>
+    <th>Project</th>
+    <th>Jenis Pengeluaran</th>
+    <th>Nominal</th>
+    <th>Status</th>
+    <th>Tanggal Pengajuan</th>
+</tr>";
 
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>";
-        echo "<td>" . htmlspecialchars($row['id_pengajuan']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['nama_lengkap']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['nama_posisi']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['nama_divisi']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['nama_project']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['nama_pengeluaran']) . "</td>";
-        echo "<td>" . number_format($row['nominal'], 0, ',', '.') . "</td>";
-        echo "<td>" . htmlspecialchars($row['nama_aktifitas'] ?? '-') . "</td>";
-        echo "</tr>";
-    }
+while ($row = $result->fetch_assoc()) {
+    echo "<tr>";
+    echo "<td>" . htmlspecialchars($row['id_pengajuan']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['nama_lengkap']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['nama_posisi']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['nama_divisi']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['nama_project']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['nama_pengeluaran']) . "</td>";
+    echo "<td>" . number_format($row['nominal'], 0, ',', '.') . "</td>";
+    echo "<td>" . htmlspecialchars($row['nama_aktifitas'] ?? '-') . "</td>";
+    echo "<td>" . htmlspecialchars(date('d-m-Y H:i', strtotime($row['tanggal_pengajuan'] ?? ''))) . "</td>";
+    echo "</tr>";
+}
+
 
     echo "</table>";
     exit();
@@ -433,7 +443,6 @@ if (isset($_GET['export']) && $_GET['export'] === 'true') {
     <?php endwhile; ?>
   </select>
 
-  <br> <br>
   <button type="submit" class="btn">Filter</button>
    <a href="export_pekerjaan_excel.php?export=true&<?= http_build_query($_GET) ?>" class="btn" style="margin-left: 10px;">Export Excel</a>
 </form>
@@ -452,6 +461,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'true') {
         <th>Jenis Pengeluaran</th>
         <th>Nominal</th>
         <th>Status</th>
+        <th>Tanggal Pengajuan</th>
       </tr>
     </thead>
     <tbody>
@@ -466,6 +476,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'true') {
         <td><?= htmlspecialchars($row['nama_pengeluaran']) ?></td>
         <td>Rp<?= number_format($row['nominal'], 0, ',', '.') ?></td>
         <td><?= htmlspecialchars($row['nama_aktifitas'] ?? '-') ?></td>
+        <td><?= date('d-m-Y', strtotime($row['tanggal_pengajuan'])) ?></td>
       </tr>
       <?php endwhile; ?>
     </tbody>
