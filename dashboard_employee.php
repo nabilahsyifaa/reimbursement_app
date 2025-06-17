@@ -38,7 +38,15 @@ $sql = "SELECT
     pr.nama_project,
     j.nama_pengeluaran,
     p.nominal,
-    a.nama_aktifitas
+    a.nama_aktifitas,
+        (
+        SELECT lp.created_at 
+        FROM log_pengajuan lp 
+        WHERE lp.id_pengajuan = l.id_pengajuan 
+          AND lp.id_aksi = 1 
+        ORDER BY lp.created_at ASC 
+        LIMIT 1
+    ) AS tanggal_pengajuan
 FROM log_pengajuan l
 JOIN pengajuan p ON l.id_pengajuan = p.id_pengajuan
 JOIN users u ON p.id_user = u.id_user
@@ -314,6 +322,7 @@ $result = $stmt->get_result();
         <th>Jenis Pengeluaran</th>
         <th>Nominal</th>
         <th>Status</th>
+        <th>Tanggal Pengajuan</th>
       </tr>
     </thead>
     <tbody>
@@ -328,6 +337,7 @@ $result = $stmt->get_result();
         <td><?= htmlspecialchars($row['nama_pengeluaran']) ?></td>
         <td>Rp<?= number_format($row['nominal'], 0, ',', '.') ?></td>
         <td><?= htmlspecialchars($row['nama_aktifitas'] ?? '-') ?></td>
+        <td><?= date('d-m-Y', strtotime($row['tanggal_pengajuan'])) ?></td>
       </tr>
       <?php endwhile; ?>
     </tbody>
