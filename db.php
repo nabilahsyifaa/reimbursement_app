@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
-$user = "root";
-$password = ""; // default XAMPP biasanya kosong
+$user = "nsworksm_nabilah";
+$password = "unsadaproject2025"; // default XAMPP biasanya kosong
 $database = "nsworksm_reimbursement_db";
 
 // Buat koneksi
