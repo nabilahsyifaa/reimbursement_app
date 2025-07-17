@@ -49,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $kode = trim($_POST['kode_project']);
   $nama = trim($_POST['nama_project']);
   $pm = $_POST['project_manager'];
+  $tanggalMulai = $_POST['tanggal_mulai'];
+  $tanggalSelesai = $_POST['tanggal_selesai'];
+  $status = isset($_POST['status']) ? 1 : 0;
 
   // Cek duplikat (kecuali ID yang sedang diedit)
   $cek = $conn->prepare("SELECT * FROM projects WHERE (kode_project = ? OR nama_project = ?) AND id_project != ? AND deleted_at IS NULL");
@@ -63,8 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Update project
-  $update = $conn->prepare("UPDATE projects SET kode_project = ?, nama_project = ?, id_pm = ?, updated_at = NOW() WHERE id_project = ?");
-  $update->bind_param("ssii", $kode, $nama, $pm, $id);
+$update = $conn->prepare("UPDATE projects 
+  SET kode_project = ?, nama_project = ?, id_pm = ?, tanggal_mulai = ?, tanggal_selesai = ?, status = ?, updated_at = NOW()
+  WHERE id_project = ?");
+$update->bind_param("ssissii", $kode, $nama, $pm, $tanggalMulai, $tanggalSelesai, $status, $id);
+
 
   if ($update->execute()) {
     $_SESSION['flash_message'] = "Project berhasil diperbarui.";
@@ -342,6 +348,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <?php endforeach; ?>
         </select>
       </div>
+
+      
+    <div class="form-group">
+      <label for="tanggalMulai">Tanggal Mulai</label>
+      <input type="date" id="tanggalMulai" name="tanggal_mulai"
+        value="<?= htmlspecialchars($project['tanggal_mulai']) ?>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="tanggalSelesai">Tanggal Selesai</label>
+      <input type="date" id="tanggalSelesai" name="tanggal_selesai"
+        value="<?= htmlspecialchars($project['tanggal_selesai']) ?>" required>
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <div class="toggle">
+        <input type="checkbox" name="status" value="1" <?= ($project['status'] == 1 ? 'checked' : '') ?> />
+        <span><?= $project['status'] == 1 ? 'Aktif' : 'Non Aktif' ?></span>
+      </div>
+    </div>
 
       <div class="form-actions">
         <button type="button" onclick="window.location.href='master_project.php'">Kembali</button>

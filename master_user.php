@@ -63,12 +63,15 @@ if (isset($_SESSION['flash_message'])) {
 
     .sidebar {
       width: 250px;
+      min-width: 250px; /* Tambahan untuk kestabilan layout */
       background-color: #003366;
       color: white;
       padding: 20px;
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
+
 
     .sidebar h2 {
       font-size: 24px;
@@ -104,7 +107,10 @@ if (isset($_SESSION['flash_message'])) {
     .main {
       flex: 1;
       padding: 30px;
+      width: 100%;
+      overflow-x: auto;
     }
+
 
     .topbar {
       display: flex;

@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     .form-actions {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start; /* Rata kiri */
       gap: 15px;
       margin-top: 30px;
     }
@@ -241,8 +241,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="topbar">
       <h1>Ubah Password</h1>
       <div>
-        <a href="#">Ubah Password</a>
-        <a href="#">Logout</a>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
+      <a href="ubah_password.php">Ubah Password</a>
+      <a href="logout.php">Logout</a>
       </div>
     </div>
     
@@ -264,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 
   <div class="form-actions">
-    <button type="button" onclick="window.location.href='dashboard_administrator.php'">Kembali</button>
+    <button type="button" onclick="window.history.back()">Kembali</button>
     <button type="submit">Simpan</button>
   </div>
 </form>

@@ -57,8 +57,8 @@ if ($result->num_rows === 0) {
 $data = $result->fetch_assoc();
 
 // Variabel untuk digunakan di form
-$namaLengkap = $data['nama_lengkap'];
-$namaPosisi = $data['nama_posisi'];
+$namaLengkap = $_SESSION['nama'] ?? 'User';
+$namaPosisi = $_SESSION['nama_posisi'] ?? 'Posisi';
 $modeProses = true; // form ini hanya untuk persetujuan, bukan edit isian utama
 
 // Ambil list project dan jenis pengeluaran (jika dibutuhkan di dropdown)
@@ -260,12 +260,11 @@ while ($row = $resLogs->fetch_assoc()) {
     }
 
     .form-actions button:last-child {
-      background-color: #003366;
-      color: white;
+      background-color: #c2c2c2;
     }
 
     .form-actions button:last-child:hover {
-      background-color: #002244;
+      background-color: #c2c2c2;
     }
 
         /* Tambahkan ini */
@@ -311,22 +310,6 @@ textarea[disabled] {
       .form-container {
         max-width: 100%;
       }
-
-          .btn {
-      background-color: #0066cc;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      margin-bottom: 15px;
-      transition: background 0.2s;
-    }
-
-    .btn:hover {
-      background-color: #004e99;
-    }
     }
   </style>
 </head>
@@ -344,6 +327,7 @@ textarea[disabled] {
   <div class="topbar">
     <h1>Detail Reimbursement</h1>
     <div>
+      <a href="pindah_posisi.php">Ubah Password</a>
       <a href="ubah_passwprd.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
     </div>
@@ -447,7 +431,7 @@ textarea[disabled] {
         <th>Lampiran</th>
       </tr>
     </thead>
-<tbody>
+    <tbody>
   <?php if (count($logList) > 0): ?>
     <?php foreach ($logList as $log): ?>
 <tr>
@@ -467,16 +451,19 @@ textarea[disabled] {
     <span class="text-muted">-</span>
   <?php endif; ?>
 </td>
-
 </tr>
-
     <?php endforeach; ?>
   <?php else: ?>
     <tr>
       <td colspan="8" class="text-center">Belum ada log pengajuan.</td>
     </tr>
   <?php endif; ?>
-</tbody>
+  </table>
+  </table>
 
-</body>
+<div class="form-actions">
+  <button type="button" onclick="window.history.back()">Kembali</button>
+</div>
+
+</tbody>
 </html>

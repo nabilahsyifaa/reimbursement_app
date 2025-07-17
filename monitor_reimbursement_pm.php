@@ -409,6 +409,7 @@ echo "<td>" . ($tanggal ? date('d-m-Y H:i', strtotime($tanggal)) : '-') . "</td>
   <div class="topbar">
     <h1>Monitor Reimbursement</h1>
     <div>
+      <a href="pindah_posisi.php">Ubah Posisi</a>
       <a href="ubah_password.php">Ubah Password</a>
       <a href="logout.php">Logout</a>
     </div>

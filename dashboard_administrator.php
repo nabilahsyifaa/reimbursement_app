@@ -59,26 +59,24 @@ $sqlChart = "
     ORDER BY total_pengajuan DESC
 ";
 
-$sqlChartProject = "
-    SELECT pr.nama_project, COUNT(p.id_pengajuan) AS total_pengajuan
-    FROM projects pr
-    LEFT JOIN pengajuan p ON p.id_project = pr.id_project
-    WHERE pr.deleted_at IS NULL
-    GROUP BY pr.id_project, pr.nama_project
+$sqlChartPengeluaran = "
+    SELECT jp.nama_pengeluaran, COUNT(p.id_pengajuan) AS total_pengajuan
+    FROM jenis_pengeluaran jp
+    LEFT JOIN pengajuan p ON p.id_pengeluaran = jp.id_pengeluaran
+    GROUP BY jp.id_pengeluaran, jp.nama_pengeluaran
     ORDER BY total_pengajuan DESC
 ";
 
 
-$resultChartProject = $conn->query($sqlChartProject);
+$resultChartPengeluaran = $conn->query($sqlChartPengeluaran);
 
-$projectLabels = [];
-$jumlahPengajuanProject = [];
+$pengeluaranLabels = [];
+$jumlahPengajuanPengeluaran = [];
 
-while ($row = $resultChartProject->fetch_assoc()) {
-    $projectLabels[] = $row['nama_project'];
-    $jumlahPengajuanProject[] = (int)$row['total_pengajuan'];
+while ($row = $resultChartPengeluaran->fetch_assoc()) {
+    $pengeluaranLabels[] = $row['nama_pengeluaran'];
+    $jumlahPengajuanPengeluaran[] = (int)$row['total_pengajuan'];
 }
-
 
 $resultChart = $conn->query($sqlChart);
 
@@ -154,7 +152,7 @@ while ($row = $resultChart->fetch_assoc()) {
   <a href="master_divisi.php">Master Divisi</a>
   <a href="master_posisi.php">Master Posisi</a>
   <a href="master_project.php">Project List</a>
-  <a href="monitor_reimbursement.php">Monitor Reimbursement</a>
+  <a href="monitor_reimbursement_admin.php">Monitor Reimbursement</a>
 </div>
 
 <div class="main">
@@ -167,18 +165,18 @@ while ($row = $resultChart->fetch_assoc()) {
     </div>
   </div>
 
-  <h2 style="margin-top: 20px; color: #003366;">Pie Chat Pengajuan Reimbursement per Divisi dan Project</h2>
+<h2 style="margin-top: 20px; color: #003366;">Pie Chart Pengajuan Reimbursement per Divisi dan Jenis Pengeluaran</h2> <br> <br> <br>
 
 <div class="chart-container">
   <div class="chart-box">
-    <canvas id="chartDivisi"></canvas>
+    <canvas id="chartDivisi" style="height: 300px;"></canvas>
   </div>
   <div class="chart-box">
-    <canvas id="chartProject"></canvas>
+    <canvas id="chartPengeluaran" style="height: 300px;"></canvas>
   </div>
 </div>
 
-
+<br> <br> <br>
 
   <table>
     <thead>
@@ -253,6 +251,7 @@ while ($row = $resultChart->fetch_assoc()) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: 'right' },
         tooltip: {
@@ -270,29 +269,30 @@ while ($row = $resultChart->fetch_assoc()) {
 </script>
 
 <script>
-  const ctxProject = document.getElementById('chartProject').getContext('2d');
-  const chartProject = new Chart(ctxProject, {
-    type: 'pie',
-    data: {
-      labels: <?= json_encode($projectLabels) ?>,
-      datasets: [{
-        label: 'Jumlah Pengajuan per Project',
-        data: <?= json_encode($jumlahPengajuanProject) ?>,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(255, 159, 64, 0.6)',
-          'rgba(201, 203, 207, 0.6)'
-        ],
-        borderColor: 'white',
-        borderWidth: 2
-      }]
-    },
+const ctxPengeluaran = document.getElementById('chartPengeluaran').getContext('2d');
+const chartPengeluaran = new Chart(ctxPengeluaran, {
+  type: 'pie',
+  data: {
+    labels: <?= json_encode($pengeluaranLabels) ?>,
+    datasets: [{
+      label: 'Jumlah Pengajuan per Jenis Pengeluaran',
+      data: <?= json_encode($jumlahPengajuanPengeluaran) ?>,
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(201, 203, 207, 0.6)'
+      ],
+      borderColor: 'white',
+      borderWidth: 2
+    }]
+  },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: 'right' },
         tooltip: {
@@ -306,7 +306,7 @@ while ($row = $resultChart->fetch_assoc()) {
         }
       }
     }
-  });
+});
 </script>
 
 

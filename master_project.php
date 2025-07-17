@@ -24,7 +24,10 @@ $sql = "SELECT
             p.id_project,
             p.kode_project, 
             p.nama_project, 
-            u.nama_lengkap AS project_manager 
+            u.nama_lengkap AS project_manager,
+            p.tanggal_mulai,
+            p.tanggal_selesai,
+            p.status
         FROM projects p
         LEFT JOIN users u ON p.id_pm = u.id_user
         WHERE p.deleted_at IS NULL
@@ -256,6 +259,9 @@ $result = $conn->query($sql);
           <th>Kode Project</th>
           <th>Nama Project</th>
           <th>Project Manager</th>
+          <th>Tanggal Mulai</th>
+          <th>Tanggal Selesai</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -269,12 +275,17 @@ $result = $conn->query($sql);
               <td><?= htmlspecialchars($row['kode_project']) ?></td>
               <td><?= htmlspecialchars($row['nama_project']) ?></td>
               <td><?= htmlspecialchars($row['project_manager']) ?></td>
+              <td><?= date('d-m-Y', strtotime($row['tanggal_mulai'])) ?></td>
+              <td><?= date('d-m-Y', strtotime($row['tanggal_selesai'])) ?></td>
+              <td><?= $row['status'] == 1 ? 'Aktif' : 'Non Aktif' ?></td>
             </tr>
           <?php endwhile; ?>
         <?php else: ?>
-          <tr>
-            <td colspan="4" style="text-align: center;">Belum ada data project.</td>
-          </tr>
+          
+      <tr>
+        <td colspan="7" style="text-align: center;">Belum ada data project.</td>
+      </tr>
+
         <?php endif; ?>
       </tbody>
     </table>

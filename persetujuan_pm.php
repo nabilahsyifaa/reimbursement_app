@@ -508,9 +508,9 @@ textarea[disabled] {
   <h5 style="margin-top: 30px; margin-bottom: 15px; font-weight: bold;">Komentar</h5>
 
   <div class="form-group">
-    <label>Pilih Aksi</label>
+    <label>Pilih Aksi*</label>
     <select name="id_aksi" required>
-      <option value="">Pilih Aksi*</option>
+      <option value="">Pilih Aksi</option>
       <?php foreach ($aksiList as $aksi): ?>
         <option value="<?= $aksi['id_aksi'] ?>"><?= htmlspecialchars($aksi['nama_aksi']) ?></option>
       <?php endforeach; ?>

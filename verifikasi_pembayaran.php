@@ -115,7 +115,7 @@ if ($lampiran && $lampiran['error'] == 0) {
     // Update log pengajuan
     $stmtUpdate = $conn->prepare("
         UPDATE log_pengajuan 
-        SET id_aktifitas = 6, id_aksi = ?, komentar = ?, lampiran_komentar = ?, updated_at = ?
+        SET id_aktifitas = 4, id_aksi = ?, komentar = ?, lampiran_komentar = ?, updated_at = ?
         WHERE id_pengajuan = ? AND id_aktifitas = 3 AND id_aksi IS NULL
     ");
     $stmtUpdate->bind_param("isssi", $id_aksi, $komentar, $fileName, $waktu, $id_pengajuan);
@@ -537,7 +537,7 @@ textarea[disabled] {
 
   <div class="form-group">
     <label>Bukti Pembayaran*</label>
-    <input type="file" name="lampiran_komentar">
+    <input type="file" name="lampiran_komentar" required>
   </div>
 
   <table class="table table-bordered table-striped">

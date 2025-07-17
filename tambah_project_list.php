@@ -26,6 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $kode = trim($_POST['kode_project']);
   $nama = trim($_POST['nama_project']);
   $pm = $_POST['project_manager'];
+  $tanggalMulai = $_POST['tanggal_mulai'];
+  $tanggalSelesai = $_POST['tanggal_selesai'];
+  $status = isset($_POST['status']) ? 1 : 0;
+
 
   // Cek apakah kode_project atau nama_project sudah ada
   $cek = $conn->prepare("SELECT * FROM projects WHERE (kode_project = ? OR nama_project = ?) AND deleted_at IS NULL");
@@ -40,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Insert data jika belum ada duplikat
-  $stmt = $conn->prepare("INSERT INTO projects (kode_project, nama_project, id_pm, created_at) VALUES (?, ?, ?, NOW())");
-  $stmt->bind_param("ssi", $kode, $nama, $pm);
+    $stmt = $conn->prepare("INSERT INTO projects (kode_project, nama_project, id_pm, tanggal_mulai, tanggal_selesai, status, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+    $stmt->bind_param("ssissi", $kode, $nama, $pm, $tanggalMulai, $tanggalSelesai, $status);
 
   if ($stmt->execute()) {
     $_SESSION['flash_message'] = "Project berhasil ditambahkan.";
@@ -307,6 +311,24 @@ if ($result && $result->num_rows > 0) {
           <?php endforeach; ?>
         </select>
       </div>
+
+    <div class="form-group">
+      <label for="tanggalMulai">Tanggal Mulai</label>
+      <input type="date" id="tanggalMulai" name="tanggal_mulai" required>
+    </div>
+
+    <div class="form-group">
+      <label for="tanggalSelesai">Tanggal Selesai</label>
+      <input type="date" id="tanggalSelesai" name="tanggal_selesai" required>
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <div class="toggle">
+        <input type="checkbox" name="status" checked />
+        <span>Aktif</span>
+      </div>
+    </div>
 
       <div class="form-actions">
         <button type="button" onclick="window.location.href='master_project.php'">Kembali</button>
